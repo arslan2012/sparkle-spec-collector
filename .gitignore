@@ -7,5 +7,6 @@
 CMakeLists.txt
 cmake-build-debug/
 
-##buils output files
+##build output files
 .build/
+Package.pins
