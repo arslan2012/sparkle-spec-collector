@@ -1,0 +1,11 @@
+# Created by .ignore support plugin (hsz.mobi)
+
+## CLion project files
+.idea/
+
+## cmake project files
+CMakeLists.txt
+cmake-build-debug/
+
+##buils output files
+.build/
