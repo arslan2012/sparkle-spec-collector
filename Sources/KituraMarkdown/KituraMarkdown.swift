@@ -71,6 +71,8 @@ public class KituraMarkdown: TemplateEngine {
     public static func render(from: Data) -> String {
         return from.withUnsafeBytes() { (bytes: UnsafePointer<Int8>) -> String in
 			var html = "<!DOCTYPE html>\n<html>"
+			
+			html += "<head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" /></head>"
         
             guard let htmlBytes = cmark_markdown_to_html(bytes, from.count, 0) else { return "" }
 
