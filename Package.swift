@@ -7,15 +7,15 @@ import PackageDescription
 let package = Package(
         name: "Sparkle Spec Collector",
         targets: [
-                Target(name: "Sparkle Spec Collector", dependencies: ["KituraMarkdown"]),
+                Target(name: "Sparkle Spec Collector", dependencies: ["KituraMarkdown","SwiftKueryPostgreSQL"]),
                 Target(name: "KituraMarkdown", dependencies: ["Ccmark"]),
-                Target(name: "Ccmark", dependencies: [])
+                Target(name: "Ccmark", dependencies: []),
+                Target(name: "SwiftKueryPostgreSQL", dependencies: [])
         ],
         dependencies: [
-                .Package(url: "https://github.com/IBM-Swift/Kitura.git", majorVersion: 1, minor: 3),
-                .Package(url: "https://github.com/IBM-Swift/HeliumLogger.git", majorVersion: 1, minor: 3),
-                .Package(url: "https://github.com/IBM-Swift/Swift-cfenv.git", majorVersion: 1, minor: 9),
-                .Package(url: "https://github.com/IBM-Bluemix/cf-deployment-tracker-client-swift.git", majorVersion: 0, minor: 8)
-        ],
-        exclude: ["Makefile", "Package-Builder"]
+                .Package(url: "https://github.com/IBM-Swift/Kitura.git", majorVersion: 1),
+                .Package(url: "https://github.com/IBM-Swift/HeliumLogger.git", majorVersion: 1),
+                .Package(url: "https://github.com/IBM-Swift/CLibpq.git", majorVersion: 0, minor: 1),
+                .Package(url: "https://github.com/IBM-Swift/Swift-Kuery.git", majorVersion: 0, minor: 5),
+        ]
 )
