@@ -16,7 +16,7 @@ import SwiftyJSON
 Log.logger = HeliumLogger()
 
 // get the environment values
-let port = Int(ProcessInfo.processInfo.environment["PORT"] ?? "8090") ?? 8090
+let port = Int(ProcessInfo.processInfo.environment["PORT"] ?? "8080") ?? 8080
 var dbURL = ProcessInfo.processInfo.environment["DATABASE_URL"] ?? "postgresql://postgres:postgres@localhost:5432/test"
 dbURL += "?sslmode=require"
 
@@ -54,12 +54,14 @@ router.get("/api/specs") { request, response, next in
 router.get("/release/en") { _, response, next in
     let myURL = URL(string: "https://raw.githubusercontent.com/arslan2012/Lazy-Hackintosh-Image-Generator/master/releasenotes.html")
     try response.render("x.md", context: ["URL": myURL ?? ""])
+//	try response.render("releasenotes.md", context: [:])
     response.status(.OK)
     next()
 }
 router.get("/release/cn") { _, response, next in
     let myURL = URL(string: "https://raw.githubusercontent.com/arslan2012/Lazy-Hackintosh-Image-Generator/master/releasenotes_cn.html")
     try response.render("x.md", context: ["URL": myURL ?? ""])
+//	try response.render("releasenotes_cn.md", context: [:])
     response.status(.OK)
     next()
 }
