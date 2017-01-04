@@ -70,14 +70,14 @@ router.get("/api/specs") { request, response, next in
 }
 
 router.get("/release/en") { _, response, next in
-    let myURL = URL(string: "https://raw.githubusercontent.com/arslan2012/Lazy-Hackintosh-Image-Generator/master/releasenotes.html")
+    let myURL = URL(string: "https://raw.githubusercontent.com/arslan2012/Lazy-Hackintosh-Image-Generator/master/releasenotes.md")
     try response.render("x.md", context: ["URL": myURL ?? ""])
 //	try response.render("releasenotes.md", context: [:])
     response.status(.OK)
     next()
 }
 router.get("/release/cn") { _, response, next in
-    let myURL = URL(string: "https://raw.githubusercontent.com/arslan2012/Lazy-Hackintosh-Image-Generator/master/releasenotes_cn.html")
+    let myURL = URL(string: "https://raw.githubusercontent.com/arslan2012/Lazy-Hackintosh-Image-Generator/master/releasenotes_cn.md")
     try response.render("x.md", context: ["URL": myURL ?? ""])
 //	try response.render("releasenotes_cn.md", context: [:])
     response.status(.OK)
