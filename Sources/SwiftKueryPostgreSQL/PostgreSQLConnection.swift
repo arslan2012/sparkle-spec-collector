@@ -63,12 +63,15 @@ public class PostgreSQLConnection: Connection {
                 connectionParameters += " dbname = \(path)"
             }
             //causes illigal instruction error on Linux temporally disable
+#if os(macOS)
             if let queryItems = components.queryItems {
                 for item in queryItems {
                     connectionParameters += " \(item.name)= \(item.value)"
                 }
             }
-//            connectionParameters += " sslmode = require"
+#elseif os(Linux)
+            connectionParameters += " sslmode = require"
+#endif
         }
         queryBuilder = PostgreSQLConnection.createQuryBuilder()
     }

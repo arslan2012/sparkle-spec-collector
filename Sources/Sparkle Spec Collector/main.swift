@@ -22,21 +22,26 @@ dbURL += "?sslmode=require"
 
 //connect to database
 let connection = PostgreSQLConnection(url: dbURL)
+connection.connect() { error in
+    if let error = error {
+        Log.error(String(describing: error))
+    } else {
+        // Build and execute your query here.
+    }
+}
 let appcastKeys = ["appName", "appVersion", "cpuFreqMHz", "cpu64bit", "cpusubtype", "cputype", "lang", "model", "ncpu", "osVersion", "ramMB"];
 var InitQuery = "CREATE TABLE IF NOT EXISTS specs (";
 for key in appcastKeys {
     InitQuery += key
-    InitQuery +=  " varchar(255) NOT NULL default '',"
+    InitQuery += " varchar(255) NOT NULL default '',"
 }
 InitQuery.remove(at: InitQuery.index(before: InitQuery.endIndex))
-InitQuery +=  ");"
+InitQuery += ");"
 connection.execute(InitQuery) { result in
     if let resultSet = result.asResultSet {
-        Log.error("init success")
-    }
-    else if let queryError = result.asError {
-        // Something went wrong.
-        Log.error("Something went wrong \(queryError)")
+        Log.info("init success")
+    } else if let queryError = result.asError {
+        Log.error(String(describing: queryError))
     }
 }
 // Disable buffering
@@ -46,6 +51,21 @@ setbuf(stdout, nil)
 let router = Router()
 router.add(templateEngine: KituraMarkdown())
 router.get("/api/specs") { request, response, next in
+    var insertQuery = "INSERT INTO specs VALUES ("
+    for key in appcastKeys {
+        insertQuery += "'"
+        insertQuery += request.queryParameters[key] ?? ""
+        insertQuery += "',"
+    }
+    insertQuery.remove(at: insertQuery.index(before: insertQuery.endIndex))
+    insertQuery += ");"
+    connection.execute(insertQuery) { result in
+        if let resultSet = result.asResultSet {
+            Log.info("new spec saved")
+        } else if let queryError = result.asError {
+            Log.error(String(describing: queryError))
+        }
+    }
     try response.redirect("https://raw.githubusercontent.com/arslan2012/Lazy-Hackintosh-Image-Generator/master/appcast.xml")
     response.status(.OK)
     next()
