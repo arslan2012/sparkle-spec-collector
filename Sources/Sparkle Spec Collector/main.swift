@@ -35,8 +35,7 @@ for key in appcastKeys {
     InitQuery += key
     InitQuery += " varchar(255) NOT NULL default '',"
 }
-InitQuery.remove(at: InitQuery.index(before: InitQuery.endIndex))
-InitQuery += ");"
+InitQuery += "time timestamp NOT NULL default CURRENT_TIMESTAMP);"
 connection.execute(InitQuery) { result in
     if let resultSet = result.asResultSet {
         Log.info("init success")
@@ -57,8 +56,7 @@ router.get("/api/specs") { request, response, next in
         insertQuery += request.queryParameters[key] ?? ""
         insertQuery += "',"
     }
-    insertQuery.remove(at: insertQuery.index(before: insertQuery.endIndex))
-    insertQuery += ");"
+    insertQuery += "DEFAULT);"
     connection.execute(insertQuery) { result in
         if let resultSet = result.asResultSet {
             Log.info("new spec saved")
