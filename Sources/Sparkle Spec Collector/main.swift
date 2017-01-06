@@ -51,12 +51,12 @@ setbuf(stdout, nil)
 let router = Router()
 router.add(templateEngine: KituraMarkdown())
 router.add(templateEngine: StencilTemplateEngine())
-router.get("/result") { _, response, next in
+router.get("/") { _, response, next in
     defer {
         next()
     }
     var sumOfAll = 0, sumOfEmptyAppName = 0
-    var LangList:[String: Int] = [:]
+    var Lang:[String: Int] = [:]
     connection.execute("SELECT * from specs where time >  CURRENT_TIMESTAMP - INTERVAL '1 months'") { result in
         if let rows = result.asRows {
             Log.info("get result success")
@@ -69,10 +69,10 @@ router.get("/result") { _, response, next in
                         }
                     }
                     if (title == "lang"){
-                        if LangList[value as! String] == nil {
-                            LangList[value as! String] = 1
+                        if Lang[value as! String] == nil {
+                            Lang[value as! String] = 1
                         } else {
-                            LangList[value as! String]! += 1
+                            Lang[value as! String]! += 1
                         }
                     }
                 }
@@ -81,9 +81,21 @@ router.get("/result") { _, response, next in
             Log.error(String(describing: queryError))
         }
     }
+    struct language {
+        let name: String
+        let frequency: Int
+    }
+    var LangList:[language] = []
+    for (key,value) in Lang {
+        if key != "" {
+            LangList.append(language(name: key, frequency: value))
+        }
+    }
+    LangList.sort(by:{ $0.frequency > $1.frequency })
     var context:[String : Any] = [
             "sumOfAll":sumOfAll,
             "sumOfEmptyAppName":sumOfEmptyAppName,
+            "percent":Double(sumOfEmptyAppName) / Double(sumOfAll) * 100,
             "LangList":LangList
     ]
     try response.render("index.stencil", context: context).end()
