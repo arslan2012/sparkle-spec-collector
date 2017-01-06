@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sparkle User Info Collector</title>
+</head>
+<body>
+<h4>This month {{sumOfAll}} apps connected to this updater</h4>
+<h4>{{sumOfEmptyAppName}} apps has their system spec sharing turned off, which is {{ sumOfEmptyAppName / sumOfAll * 100 }}%</h4>
+<h4>most of your app's user is using language {{LangList[0]}}</h4>
+<h5>This month these language are detected</h5>
+<ul>
+  {% for lang in LangList %}
+    <li>{{ lang.name }} has been detected {{ lang.frequency }}</li>
+  {% endfor %}
+</ul>
+</body>
+</html>

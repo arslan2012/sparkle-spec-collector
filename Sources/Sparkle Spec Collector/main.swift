@@ -7,6 +7,7 @@ import HeliumLogger
 import Foundation
 import Kitura
 import KituraMarkdown
+import KituraStencil
 import SwiftKuery
 import SwiftKueryPostgreSQL
 import LoggerAPI
@@ -37,10 +38,10 @@ for key in appcastKeys {
 }
 InitQuery += "time timestamp NOT NULL default CURRENT_TIMESTAMP);"
 connection.execute(InitQuery) { result in
-    if let resultSet = result.asResultSet {
-        Log.info("init success")
-    } else if let queryError = result.asError {
+    if let queryError = result.asError {
         Log.error(String(describing: queryError))
+    } else {
+        Log.info("init table succeed")
     }
 }
 // Disable buffering
@@ -49,7 +50,49 @@ setbuf(stdout, nil)
 // setup routes
 let router = Router()
 router.add(templateEngine: KituraMarkdown())
+router.add(templateEngine: StencilTemplateEngine())
+router.get("/result") { _, response, next in
+    defer {
+        next()
+    }
+    var sumOfAll = 0, sumOfEmptyAppName = 0
+    var LangList:[String: Int] = [:]
+    connection.execute("SELECT * from specs where time >  CURRENT_TIMESTAMP - INTERVAL '1 months'") { result in
+        if let rows = result.asRows {
+            Log.info("get result success")
+            for row in rows {
+                for (title, value) in row {
+                    if (title == "appname"){
+                        sumOfAll += 1
+                        if value as! String == "" {
+                            sumOfEmptyAppName += 1
+                        }
+                    }
+                    if (title == "lang"){
+                        if LangList[value as! String] == nil {
+                            LangList[value as! String] = 1
+                        } else {
+                            LangList[value as! String]! += 1
+                        }
+                    }
+                }
+            }
+        } else if let queryError = result.asError {
+            Log.error(String(describing: queryError))
+        }
+    }
+    var context:[String : Any] = [
+            "sumOfAll":sumOfAll,
+            "sumOfEmptyAppName":sumOfEmptyAppName,
+            "LangList":LangList
+    ]
+    try response.render("index.stencil", context: context).end()
+}
 router.get("/api/specs") { request, response, next in
+    defer {
+        next()
+    }
+    try response.redirect("https://raw.githubusercontent.com/arslan2012/Lazy-Hackintosh-Image-Generator/master/appcast.xml").end()
     var insertQuery = "INSERT INTO specs VALUES ("
     for key in appcastKeys {
         insertQuery += "'"
@@ -64,24 +107,21 @@ router.get("/api/specs") { request, response, next in
             Log.error(String(describing: queryError))
         }
     }
-    try response.redirect("https://raw.githubusercontent.com/arslan2012/Lazy-Hackintosh-Image-Generator/master/appcast.xml")
-    response.status(.OK)
-    next()
 }
 
 router.get("/release/en") { _, response, next in
+    defer {
+        next()
+    }
     let myURL = URL(string: "https://raw.githubusercontent.com/arslan2012/Lazy-Hackintosh-Image-Generator/master/releasenotes.md")
-    try response.render("x.md", context: ["URL": myURL ?? ""])
-//	try response.render("releasenotes.md", context: [:])
-    response.status(.OK)
-    next()
+    try response.render("x.md", context: ["URL": myURL ?? ""]).end()
 }
 router.get("/release/cn") { _, response, next in
+    defer {
+        next()
+    }
     let myURL = URL(string: "https://raw.githubusercontent.com/arslan2012/Lazy-Hackintosh-Image-Generator/master/releasenotes_cn.md")
-    try response.render("x.md", context: ["URL": myURL ?? ""])
-//	try response.render("releasenotes_cn.md", context: [:])
-    response.status(.OK)
-    next()
+    try response.render("x.md", context: ["URL": myURL ?? ""]).end()
 }
 
 // Start server

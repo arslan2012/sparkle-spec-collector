@@ -17,5 +17,6 @@ let package = Package(
                 .Package(url: "https://github.com/IBM-Swift/HeliumLogger.git", majorVersion: 1),
                 .Package(url: "https://github.com/IBM-Swift/CLibpq.git", majorVersion: 0, minor: 1),
                 .Package(url: "https://github.com/IBM-Swift/Swift-Kuery.git", majorVersion: 0, minor: 5),
+                .Package(url: "https://github.com/IBM-Swift/Kitura-StencilTemplateEngine.git", majorVersion: 1)
         ]
 )
